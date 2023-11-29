@@ -2,58 +2,32 @@
 
 namespace Hgabka\GoogleCloudBundle\Adapter;
 
-
 use Gaufrette\Adapter;
-use Gaufrette\Adapter\ChecksumCalculator;
 use Gaufrette\Adapter\MimeTypeProvider;
 use Gaufrette\Adapter\SizeCalculator;
-use Gaufrette\Adapter\StreamFactory;
-use Gaufrette\Util;
 use Google\Cloud\Storage\Bucket;
 use Google\Cloud\Storage\StorageClient;
-use Symfony\Contracts\Service\Attribute\Required;
 
 class GoogleCloudAdapter implements Adapter, SizeCalculator, MimeTypeProvider
 {
-    protected $directory;
-    private $create;
-    private $mode;
+    protected ?Bucket $bucket = null;
 
-    private $bucketName = null;
+    protected StorageClient $client;
 
-    private ?Bucket $bucket = null;
-
-    private StorageClient $client;
-
-    public function __construct($directory, $create = false, $bucketName = '', $mode = 0777)
-    {
-        $this->directory = rtrim(ltrim($directory, '/'), '/').'/';
-
-        $this->create = $create;
-        $this->mode = $mode;
-        $this->bucketName = $bucketName;
+    public function __construct(
+        protected ?string $directory,
+        protected readonly ?string $bucketName = '',
+    ) {
+        if (!empty($this->directory)) {
+            $this->directory = rtrim(ltrim($directory, '/'), '/') . '/';
+        }
     }
 
-    #[Required]
     public function setClient(StorageClient $client): self
     {
         $this->client = $client;
 
         return $this;
-    }
-
-    protected function getBucket(): ?Bucket
-    {
-        if (null === $this->bucket) {
-            $this->bucket = $this->client->bucket($this->bucketName);
-        }
-
-        return $this->bucket;
-    }
-
-    protected function getObject($key)
-    {
-        return $this->getBucket()->object($this->directory . $key);
     }
 
     public function read($key)
@@ -155,17 +129,16 @@ class GoogleCloudAdapter implements Adapter, SizeCalculator, MimeTypeProvider
     /**
      * @param string $key
      *
-     * @return bool
-     *
      * @throws \OutOfBoundsException     If the computed path is out of the directory
      * @throws \InvalidArgumentException if the directory already exists
      * @throws \RuntimeException         if the directory could not be created
+     *
+     * @return bool
      */
     public function isDirectory($key): bool
     {
         return str_ends_with($key, '/');
     }
-
 
     /**
      * {@inheritdoc}
@@ -205,5 +178,19 @@ class GoogleCloudAdapter implements Adapter, SizeCalculator, MimeTypeProvider
         $info = $object->info();
 
         return $info['contentType'] ?? false;
+    }
+
+    protected function getBucket(): ?Bucket
+    {
+        if (null === $this->bucket) {
+            $this->bucket = $this->client->bucket($this->bucketName);
+        }
+
+        return $this->bucket;
+    }
+
+    protected function getObject($key)
+    {
+        return $this->getBucket()->object($this->directory . $key);
     }
 }

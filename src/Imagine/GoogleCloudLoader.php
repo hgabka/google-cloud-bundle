@@ -2,7 +2,6 @@
 
 namespace Hgabka\GoogleCloudBundle\Imagine;
 
-
 use Google\Cloud\Storage\StorageClient;
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
@@ -15,7 +14,6 @@ use Symfony\Component\Mime\MimeTypes;
 ])]
 class GoogleCloudLoader implements LoaderInterface
 {
-
     public function __construct(private readonly StorageClient $client, private readonly string $bucket)
     {
     }
@@ -45,7 +43,6 @@ class GoogleCloudLoader implements LoaderInterface
 
     public function getBaseUrl(): string
     {
-        return 'https://storage.googleapis.com/'.$this->bucket .'/';
+        return 'https://storage.googleapis.com/' . $this->bucket . '/';
     }
-
 }

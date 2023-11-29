@@ -2,7 +2,6 @@
 
 namespace Hgabka\GoogleCloudBundle\Imagine;
 
-
 use Google\Cloud\Storage\StorageClient;
 use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Cache\Helper\PathHelper;
@@ -15,50 +14,23 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 ])]
 class GoogleCloudResolver implements ResolverInterface
 {
-
     public function __construct(
-        private readonly StorageClient $client, 
+        private readonly StorageClient $client,
         private readonly FilterConfiguration $filterConfiguration,
         private readonly string $bucket,
         private readonly string $cachePrefix = 'uploads/cache',
-    )
-    {
-    }
-
-    private function changeFileExtension(string $path, string $filter): string
-    {
-        $format = $this->filterConfiguration->get($filter)['format'] ?? null;
-        if (!$format) {
-            return $path;
-        }
-
-        $info = pathinfo($path);
-        $path = $info['dirname'] . \DIRECTORY_SEPARATOR . $info['filename'] . '.' . $format;
-
-        return $path;
+    ) {
     }
 
     public function resolve($path, $filter)
     {
         $path = $this->changeFileExtension($path, $filter);
 
-        return sprintf('%s/%s',
+        return sprintf(
+            '%s/%s',
             rtrim($this->getBaseUrl(), '/'),
             ltrim($this->getFileUrl($path, $filter), '/')
         );
-    }
-
-    private function getFullPath($path, $filter): string
-    {
-        // crude way of sanitizing URL scheme ("protocol") part
-        $path = str_replace('://', '---', $path);
-
-        return $this->cachePrefix . '/' . $filter . '/' . ltrim($path, '/');
-    }
-
-    protected function getFileUrl($path, $filter): string
-    {
-        return PathHelper::filePathToUrlPath($this->getFullPath($path, $filter));
     }
 
     public function isStored($path, $filter): bool
@@ -68,7 +40,6 @@ class GoogleCloudResolver implements ResolverInterface
 
         $object = $bucket->object($this->getFileUrl($path, $filter));
 
-
         return $object->exists();
     }
 
@@ -77,12 +48,13 @@ class GoogleCloudResolver implements ResolverInterface
         $path = $this->changeFileExtension($path, $filter);
         $bucket = $this->client->bucket($this->bucket);
 
-        $bucket->upload($binary->getContent(), [
+        $bucket->upload(
+            $binary->getContent(),
+            [
                 'name' => $this->getFileUrl($path, $filter),
             ]
         );
     }
-
 
     public function getBaseUrl(): string
     {
@@ -96,11 +68,10 @@ class GoogleCloudResolver implements ResolverInterface
         }
         $bucket = $this->client->bucket($this->bucket);
 
-
         if (empty($paths)) {
             foreach ($filters as $filter) {
                 $objects = $bucket->objects([
-                    'prefix' => $this->cachePrefix . '/' . $filter
+                    'prefix' => $this->cachePrefix . '/' . $filter,
                 ]);
 
                 foreach ($objects as $object) {
@@ -119,4 +90,29 @@ class GoogleCloudResolver implements ResolverInterface
         }
     }
 
+    protected function getFileUrl($path, $filter): string
+    {
+        return PathHelper::filePathToUrlPath($this->getFullPath($path, $filter));
+    }
+
+    private function changeFileExtension(string $path, string $filter): string
+    {
+        $format = $this->filterConfiguration->get($filter)['format'] ?? null;
+        if (!$format) {
+            return $path;
+        }
+
+        $info = pathinfo($path);
+        $path = $info['dirname'] . \DIRECTORY_SEPARATOR . $info['filename'] . '.' . $format;
+
+        return $path;
+    }
+
+    private function getFullPath($path, $filter): string
+    {
+        // crude way of sanitizing URL scheme ("protocol") part
+        $path = str_replace('://', '---', $path);
+
+        return $this->cachePrefix . '/' . $filter . '/' . ltrim($path, '/');
+    }
 }

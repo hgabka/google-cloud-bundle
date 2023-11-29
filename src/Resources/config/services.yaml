@@ -37,11 +37,34 @@ services:
         class: Gaufrette\Filesystem
         arguments:
             - '@Hgabka\GoogleCloudBundle\Adapter\GoogleCloudAdapter'
+            -
+    google_cloud.filesystem_media:
+        class: Gaufrette\Filesystem
+        arguments:
+            - '@Hgabka\GoogleCloudBundle\Adapter\GoogleCloudMediaAdapter'
+
+    google_cloud.filesystem_media_protected:
+        class: Gaufrette\Filesystem
+        arguments:
+            - '@Hgabka\GoogleCloudBundle\Adapter\GoogleCloudMediaProtectedAdapter'
 
     Hgabka\GoogleCloudBundle\Adapter\GoogleCloudAdapter:
         arguments:
+            - ''
+            - '%hgabka_google_cloud.bucket%'
+        calls:
+            - [setClient, ['@google_cloud_storage_client']]
+
+    Hgabka\GoogleCloudBundle\Adapter\GoogleCloudMediaAdapter:
+        arguments:
             - '%hgabka_media.media_path%'
-            - true
+            - '%hgabka_google_cloud.bucket%'
+        calls:
+            - [setClient, ['@google_cloud_storage_client']]
+
+    Hgabka\GoogleCloudBundle\Adapter\GoogleCloudMediaProtectedAdapter:
+        arguments:
+            - '%hgabka_media.protected_media_path%'
             - '%hgabka_google_cloud.bucket%'
         calls:
             - [setClient, ['@google_cloud_storage_client']]

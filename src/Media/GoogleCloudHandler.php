@@ -2,20 +2,25 @@
 
 namespace Hgabka\GoogleCloudBundle\Media;
 
-
 use Hgabka\MediaBundle\Entity\Media;
 use Hgabka\MediaBundle\Form\File\FileType;
 use Hgabka\MediaBundle\Helper\File\FileHandler;
 use Hgabka\MediaBundle\Helper\File\FileHelper;
-use Hgabka\MediaBundle\Helper\Media\AbstractMediaHandler;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AutoconfigureTag('hgabka_media.media_handler')]
-class GoogleCloudHandler  extends FileHandler
+class GoogleCloudHandler extends FileHandler
 {
     public const TYPE = 'google_cloud';
+
+    public $mediaPath;
+
+    /**
+     * @var string
+     */
+    public $protectedMediaPath;
 
     /**
      * Files with a blacklisted extension will be converted to txt.
@@ -26,13 +31,6 @@ class GoogleCloudHandler  extends FileHandler
 
     /** @var int */
     private $folderDepth;
-
-    public $mediaPath;
-
-    /**
-     * @var string
-     */
-    public $protectedMediaPath;
 
     public function setFolderDepth(int $depth)
     {

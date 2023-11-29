@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache_path')->defaultValue('uploads/cache')->end()
             ->end()
         ;
+
         return $treeBuilder;
     }
 }
