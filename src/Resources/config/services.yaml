@@ -12,3 +12,33 @@ services:
             - '../../Entity/'
             - '../../Resources/'
         
+    Hgabka\GoogleCloudBundle\Imagine\GoogleCloudResolver:
+        arguments:
+            $client: '@google_cloud_storage_client'
+            $cachePrefix: 'uploads/cache'
+            $filterConfiguration: '@liip_imagine.filter.configuration'
+
+    Hgabka\GoogleCloudBundle\Imagine\GoogleCloudLoader:
+        arguments:
+            $client: '@google_cloud_storage_client'
+
+    Hgabka\GoogleCloudBundle\Media\GoogleCloudHandler:
+        arguments: [ 0, '@mime_types', '' ]
+        calls:
+            - [ setFileSystem, ['@google_cloud.filesystem']]
+            - [ setMediaPath, [ '%hgabka_media.media_path%' ] ]
+            - [ setBlacklistedExtensions, [ '%hgabka_media.blacklisted_extensions%' ] ]
+            - [ setHgabkaUtils, [ '@hgabka_utils.hgabka_utils' ] ]
+            - [ setFolderDepth, [ '%hgabka_media.folder_depth%' ] ]
+
+    google_cloud.filesystem:
+        class: Gaufrette\Filesystem
+        arguments:
+            - '@Hgabka\GoogleCloudBundle\Adapter\GoogleCloudAdapter'
+
+    Hgabka\GoogleCloudBundle\Adapter\GoogleCloudAdapter:
+        arguments:
+            - '%hgabka_media.media_path%'
+            - true
+        calls:
+            - [setClient, ['@google_cloud_storage_client']]
