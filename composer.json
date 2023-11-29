@@ -1,0 +1,39 @@
+{
+    "name": "hgabka/google-cloud-bundle",
+    "type": "Symfony bundle",
+    "description": "Google Cloud bundle",
+    "keywords": [
+    ],
+    "homepage": "https://github.com/hgabka/google-cloud-bundle",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Gabe",
+            "email": "hgabka@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=8.0.2",
+        "symfony/framework-bundle": "^6.0",
+        "hgabka/utils-bundle": "^6.0",
+        "google/cloud-storage": "^1.35",
+	"liip/imagine-bundle": "^2.7",
+    },
+    "autoload": {
+        "psr-4": {
+            "Hgabka\\GoogleCloudBundle\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Hgabka\\NodeBundle\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
+
