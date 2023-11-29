@@ -15,12 +15,14 @@ services:
     Hgabka\GoogleCloudBundle\Imagine\GoogleCloudResolver:
         arguments:
             $client: '@google_cloud_storage_client'
-            $cachePrefix: 'uploads/cache'
+            $cachePrefix: '%hgabka_google_cloud.cache_path%'
+            $bucket: '%hgabka_google_cloud.bucket%'
             $filterConfiguration: '@liip_imagine.filter.configuration'
 
     Hgabka\GoogleCloudBundle\Imagine\GoogleCloudLoader:
         arguments:
             $client: '@google_cloud_storage_client'
+            $bucket: '%hgabka_google_cloud.bucket%'
 
     Hgabka\GoogleCloudBundle\Media\GoogleCloudHandler:
         arguments: [ 0, '@mime_types', '' ]
@@ -40,5 +42,6 @@ services:
         arguments:
             - '%hgabka_media.media_path%'
             - true
+            - '%hgabka_google_cloud.bucket%'
         calls:
             - [setClient, ['@google_cloud_storage_client']]

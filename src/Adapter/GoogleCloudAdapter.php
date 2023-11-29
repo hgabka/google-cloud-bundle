@@ -19,18 +19,19 @@ class GoogleCloudAdapter implements Adapter, SizeCalculator, MimeTypeProvider
     private $create;
     private $mode;
 
-    private $bucketName = 'parfumhu';
+    private $bucketName = null;
 
     private ?Bucket $bucket = null;
 
     private StorageClient $client;
 
-    public function __construct($directory, $create = false, $mode = 0777)
+    public function __construct($directory, $create = false, $bucketName = '', $mode = 0777)
     {
         $this->directory = rtrim(ltrim($directory, '/'), '/').'/';
 
         $this->create = $create;
         $this->mode = $mode;
+        $this->bucketName = $bucketName;
     }
 
     #[Required]

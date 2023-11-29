@@ -16,7 +16,7 @@ use Symfony\Component\Mime\MimeTypes;
 class GoogleCloudLoader implements LoaderInterface
 {
 
-    public function __construct(private readonly StorageClient $client,)
+    public function __construct(private readonly StorageClient $client, private readonly string $bucket)
     {
     }
 
@@ -26,7 +26,7 @@ class GoogleCloudLoader implements LoaderInterface
             $path = str_replace($this->getBaseUrl(), '', $path);
         }
 
-        $bucket = $this->client->bucket('parfumhu');
+        $bucket = $this->client->bucket($this->bucket);
         $object = $bucket->object($path);
 
         if (!$object->exists()) {
@@ -45,7 +45,7 @@ class GoogleCloudLoader implements LoaderInterface
 
     public function getBaseUrl(): string
     {
-        return 'https://storage.googleapis.com/parfumhu/';
+        return 'https://storage.googleapis.com/'.$this->bucket .'/';
     }
 
 }

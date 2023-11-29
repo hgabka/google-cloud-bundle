@@ -16,7 +16,12 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 class GoogleCloudResolver implements ResolverInterface
 {
 
-    public function __construct(private readonly StorageClient $client, private readonly FilterConfiguration $filterConfiguration, private readonly string $cachePrefix = 'uploads/cache')
+    public function __construct(
+        private readonly StorageClient $client, 
+        private readonly FilterConfiguration $filterConfiguration,
+        private readonly string $bucket,
+        private readonly string $cachePrefix = 'uploads/cache',
+    )
     {
     }
 
@@ -59,7 +64,7 @@ class GoogleCloudResolver implements ResolverInterface
     public function isStored($path, $filter): bool
     {
         $path = $this->changeFileExtension($path, $filter);
-        $bucket = $this->client->bucket('parfumhu');
+        $bucket = $this->client->bucket($this->bucket);
 
         $object = $bucket->object($this->getFileUrl($path, $filter));
 
@@ -70,7 +75,7 @@ class GoogleCloudResolver implements ResolverInterface
     public function store(BinaryInterface $binary, $path, $filter): void
     {
         $path = $this->changeFileExtension($path, $filter);
-        $bucket = $this->client->bucket('parfumhu');
+        $bucket = $this->client->bucket($this->bucket);
 
         $bucket->upload($binary->getContent(), [
                 'name' => $this->getFileUrl($path, $filter),
@@ -81,7 +86,7 @@ class GoogleCloudResolver implements ResolverInterface
 
     public function getBaseUrl(): string
     {
-        return 'https://storage.googleapis.com/parfumhu';
+        return 'https://storage.googleapis.com/' . $this->bucket;
     }
 
     public function remove(array $paths, array $filters): void
@@ -89,7 +94,7 @@ class GoogleCloudResolver implements ResolverInterface
         if (empty($paths) && empty($filters)) {
             return;
         }
-        $bucket = $this->client->bucket('parfumhu');
+        $bucket = $this->client->bucket($this->bucket);
 
 
         if (empty($paths)) {

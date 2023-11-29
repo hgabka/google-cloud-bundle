@@ -24,6 +24,9 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('bucket')->defaultValue(null)->end()
             ->end()
+            ->children()
+                ->scalarNode('cache_path')->defaultValue('uploads/cache')->end()
+            ->end()
         ;
         return $treeBuilder;
     }
