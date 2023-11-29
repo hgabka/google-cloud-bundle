@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('bucket')->defaultValue(null)->end()
+                ->scalarNode('bucket')->isRequired()->cannotBeEmpty()->end()
             ->end()
             ->children()
                 ->scalarNode('cache_path')->defaultValue('uploads/cache')->end()
