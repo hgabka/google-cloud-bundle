@@ -8,7 +8,7 @@ services:
     Hgabka\GoogleCloudBundle\:
         resource: '../../src/'
         exclude:
-            - '../../src/DependencyInjection/'
-            - '../../src/Entity/'
-            - '../../src/Resources/'
+            - '../../DependencyInjection/'
+            - '../../Entity/'
+            - '../../Resources/'
         
