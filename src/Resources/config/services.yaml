@@ -25,13 +25,16 @@ services:
             $bucket: '%hgabka_google_cloud.bucket%'
 
     Hgabka\GoogleCloudBundle\Media\GoogleCloudHandler:
-        arguments: [ 0, '@mime_types', '' ]
+        arguments: [ 2, '@mime_types', '' ]
         calls:
-            - [ setFileSystem, ['@google_cloud.filesystem']]
+            - [ setFileSystem, ['@google_cloud.filesystem_media']]
+            - [ setProtectedFileSystem, ['@google_cloud.filesystem_media_protected']]
             - [ setMediaPath, [ '%hgabka_media.media_path%' ] ]
+            - [ setProtectedMediaPath, [ '%hgabka_media.protected_media_path%' ] ]
             - [ setBlacklistedExtensions, [ '%hgabka_media.blacklisted_extensions%' ] ]
             - [ setHgabkaUtils, [ '@hgabka_utils.hgabka_utils' ] ]
             - [ setFolderDepth, [ '%hgabka_media.folder_depth%' ] ]
+            - [ setBucketName, [ '%hgabka_google_cloud.bucket%' ] ]
 
     google_cloud.filesystem:
         class: Gaufrette\Filesystem

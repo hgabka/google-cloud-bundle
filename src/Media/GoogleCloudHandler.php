@@ -6,8 +6,10 @@ use Hgabka\MediaBundle\Entity\Media;
 use Hgabka\MediaBundle\Form\File\FileType;
 use Hgabka\MediaBundle\Helper\File\FileHandler;
 use Hgabka\MediaBundle\Helper\File\FileHelper;
+use phpDocumentor\Reflection\Types\Parent_;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AutoconfigureTag('hgabka_media.media_handler')]
@@ -15,22 +17,8 @@ class GoogleCloudHandler extends FileHandler
 {
     public const TYPE = 'google_cloud';
 
-    public $mediaPath;
+    public $bucketName = '';
 
-    /**
-     * @var string
-     */
-    public $protectedMediaPath;
-
-    /**
-     * Files with a blacklisted extension will be converted to txt.
-     *
-     * @var array
-     */
-    private $blacklistedExtensions = [];
-
-    /** @var int */
-    private $folderDepth;
 
     public function setFolderDepth(int $depth)
     {
@@ -40,6 +28,18 @@ class GoogleCloudHandler extends FileHandler
     public function setUrlGenerator(UrlGeneratorInterface $urlGenerator)
     {
         $this->urlGenerator = $urlGenerator;
+
+        return $this;
+    }
+
+    public function getBucketName(): string
+    {
+        return $this->bucketName;
+    }
+
+    public function setBucketName(string $bucketName): self
+    {
+        $this->bucketName = $bucketName;
 
         return $this;
     }
@@ -98,11 +98,11 @@ class GoogleCloudHandler extends FileHandler
      *
      * @return bool
      */
-    public function canHandle($object): bool
+    public function canHandle($object)
     {
         if ($object instanceof File ||
             ($object instanceof Media &&
-                'google_cloud' === $object->getLocation())
+                ((!empty($object->getContent()) && is_file($object->getContent())) || 'google_cloud' === $object->getLocation()))
         ) {
             return true;
         }
@@ -116,5 +116,32 @@ class GoogleCloudHandler extends FileHandler
     public function getFormHelper(Media $media)
     {
         return new FileHelper($media, $this->mediaPath);
+    }
+
+    public function prepareMedia(Media $media)
+    {
+        parent::prepareMedia($media);
+
+        $media->setUrl('https://storage.googleapis.com/' . $this->bucketName . ($media->isProtected() ? $this->protectedMediaPath : $this->mediaPath) . $this->getFilePath($media));
+        $media->setLocation('google_cloud');
+
+        if ($media->getContent() && str_starts_with($media->getContentType(), 'image')) {
+            $imageInfo = getimagesize($media->getContent());
+            $width = $imageInfo[0];
+            $height = $imageInfo[1];
+
+            $media
+                ->setMetadataValue('original_width', $width)
+                ->setMetadataValue('original_height', $height);
+        }
+    }
+
+    public function getImageUrl(Media $media, $basepath)
+    {
+        if (!$media->isProtected()) {
+            return $media->getUrl();
+        }
+
+        return $this->urlGenerator->generate('HgabkaMediaBundle_admin_download_inline', ['media' => $media->getId()]);
     }
 }
