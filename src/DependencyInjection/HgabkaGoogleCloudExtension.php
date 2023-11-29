@@ -24,6 +24,6 @@ class HgabkaGoogleCloudExtension extends Extension
 
         $container->setParameter('hgabka_google_cloud.bucket', $config['bucket']);
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.yml');
+        $loader->load('services.yaml');
     }
 }
