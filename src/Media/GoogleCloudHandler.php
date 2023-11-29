@@ -6,10 +6,8 @@ use Hgabka\MediaBundle\Entity\Media;
 use Hgabka\MediaBundle\Form\File\FileType;
 use Hgabka\MediaBundle\Helper\File\FileHandler;
 use Hgabka\MediaBundle\Helper\File\FileHelper;
-use phpDocumentor\Reflection\Types\Parent_;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AutoconfigureTag('hgabka_media.media_handler')]
@@ -18,7 +16,6 @@ class GoogleCloudHandler extends FileHandler
     public const TYPE = 'google_cloud';
 
     public $bucketName = '';
-
 
     public function setFolderDepth(int $depth)
     {
@@ -138,6 +135,10 @@ class GoogleCloudHandler extends FileHandler
 
     public function getImageUrl(Media $media, $basepath)
     {
+        if (!str_starts_with($media->getContentType(), 'image')) {
+            return null;
+        }
+
         if (!$media->isProtected()) {
             return $media->getUrl();
         }
