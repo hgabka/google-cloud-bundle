@@ -43,12 +43,12 @@ hgabka_google_cloud:
 
 ## Liip imagine
 
-There is a resolver that  saves the filtered image in Google Cloud as well. The cache is created in the liip imagine cache directory (hgabka_media.liip_imagine_cache_prefix)
+There is a resolver that  saves the filtered image in Google Cloud. The cache is created in the liip imagine cache directory (hgabka_media.liip_imagine_cache_prefix, see Media bundle)
 The 'google_cloud' resolver can be set in the filter call:
 
 
 ```
-asset(googleCloudImageUrl)|imagine_filter('filter', [], 'google_cloud')
+asset(imagePath)|imagine_filter('filter', [], 'google_cloud')
 ```
 
 
@@ -60,7 +60,7 @@ liip_imagine:
 ```
 
 
-Also there is a loader that loads the image from the Google Cloud image url. This can be set on filter level:
+If the original image is also in Google Cloud, the normal WebPatResolver will not work. For this purpose there is a loader that loads the image from the Google Cloud image url. This can be set on filter level:
 ```
     filter_sets:
         my_filter:
@@ -75,3 +75,10 @@ Or globally:
 liip_imagine:
     data_loader: google_cloud
 ```
+
+You can mix the two, but the Google Cloud loader will only work for images in Google Cloud, while the default loader will only work for local images.
+
+## Media bundle
+
+
+The bundle has a media handler, whose priority is higher than the ones of media bundle. So after enabling this bundle, all uploads will go to Google Cloud. Old local images will be handled normally, only the new uploads will go to the cloud.
