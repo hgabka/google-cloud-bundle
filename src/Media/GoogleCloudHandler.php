@@ -15,7 +15,21 @@ class GoogleCloudHandler extends FileHandler
 {
     public const TYPE = 'google_cloud';
 
-    public $bucketName = '';
+    protected string $bucketName = '';
+
+    protected string $googleCloudHost = '';
+
+    public function getGoogleCloudHost(): string
+    {
+        return $this->googleCloudHost;
+    }
+
+    public function setGoogleCloudHost(string $googleCloudHost): self
+    {
+        $this->googleCloudHost = $googleCloudHost;
+
+        return $this;
+    }
 
     public function setFolderDepth(int $depth)
     {
@@ -119,7 +133,7 @@ class GoogleCloudHandler extends FileHandler
     {
         parent::prepareMedia($media);
 
-        $media->setUrl('https://storage.googleapis.com/' . $this->bucketName . ($media->isProtected() ? $this->protectedMediaPath : $this->mediaPath) . $this->getFilePath($media));
+        $media->setUrl($this->googleCloudHost . '/' . $this->bucketName . ($media->isProtected() ? $this->protectedMediaPath : $this->mediaPath) . $this->getFilePath($media));
         $media->setLocation('google_cloud');
 
         if ($media->getContent() && str_starts_with($media->getContentType(), 'image')) {

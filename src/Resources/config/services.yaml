@@ -15,14 +15,16 @@ services:
     Hgabka\GoogleCloudBundle\Imagine\GoogleCloudResolver:
         arguments:
             $client: '@google_cloud_storage_client'
-            $cachePrefix: '%hgabka_google_cloud.cache_path%'
+            $cachePrefix: '%hgabka_media.liip_imagine.cache_prefix%'
             $bucket: '%hgabka_google_cloud.bucket%'
             $filterConfiguration: '@liip_imagine.filter.configuration'
+            $googleCloudHost: '%hgabka_google_cloud.google_cloud_host%'
 
     Hgabka\GoogleCloudBundle\Imagine\GoogleCloudLoader:
         arguments:
             $client: '@google_cloud_storage_client'
             $bucket: '%hgabka_google_cloud.bucket%'
+            $googleCloudHost: '%hgabka_google_cloud.google_cloud_host%'
 
     Hgabka\GoogleCloudBundle\Media\GoogleCloudHandler:
         arguments: [ 2, '@mime_types', '' ]
@@ -35,12 +37,13 @@ services:
             - [ setHgabkaUtils, [ '@hgabka_utils.hgabka_utils' ] ]
             - [ setFolderDepth, [ '%hgabka_media.folder_depth%' ] ]
             - [ setBucketName, [ '%hgabka_google_cloud.bucket%' ] ]
+            - [ setGoogleCloudHost, [ '%hgabka_google_cloud.google_cloud_host%' ] ]
 
     google_cloud.filesystem:
         class: Gaufrette\Filesystem
         arguments:
             - '@Hgabka\GoogleCloudBundle\Adapter\GoogleCloudAdapter'
-            -
+
     google_cloud.filesystem_media:
         class: Gaufrette\Filesystem
         arguments:

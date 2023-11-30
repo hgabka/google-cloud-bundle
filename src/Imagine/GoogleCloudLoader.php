@@ -14,7 +14,7 @@ use Symfony\Component\Mime\MimeTypes;
 ])]
 class GoogleCloudLoader implements LoaderInterface
 {
-    public function __construct(private readonly StorageClient $client, private readonly string $bucket)
+    public function __construct(private readonly StorageClient $client, private readonly string $bucket, private readonly string $googleCloudHost)
     {
     }
 
@@ -43,6 +43,6 @@ class GoogleCloudLoader implements LoaderInterface
 
     public function getBaseUrl(): string
     {
-        return 'https://storage.googleapis.com/' . $this->bucket . '/';
+        return $this->googleCloudHost . '/' . $this->bucket . '/';
     }
 }

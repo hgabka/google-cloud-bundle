@@ -18,7 +18,8 @@ class GoogleCloudResolver implements ResolverInterface
         private readonly StorageClient $client,
         private readonly FilterConfiguration $filterConfiguration,
         private readonly string $bucket,
-        private readonly string $cachePrefix = 'uploads/cache',
+        private readonly string $cachePrefix,
+        private readonly string $googleCloudHost,
     ) {
     }
 
@@ -58,7 +59,7 @@ class GoogleCloudResolver implements ResolverInterface
 
     public function getBaseUrl(): string
     {
-        return 'https://storage.googleapis.com/' . $this->bucket;
+        return $this->googleCloudHost . '/' . $this->bucket;
     }
 
     public function remove(array $paths, array $filters): void
@@ -110,6 +111,7 @@ class GoogleCloudResolver implements ResolverInterface
 
     private function getFullPath($path, $filter): string
     {
+        $path = str_replace($this->googleCloudHost . '/' . $this->bucket . '/', '', $path);
         // crude way of sanitizing URL scheme ("protocol") part
         $path = str_replace('://', '---', $path);
 

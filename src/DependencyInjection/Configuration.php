@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('bucket')->isRequired()->cannotBeEmpty()->end()
             ->end()
             ->children()
-                ->scalarNode('cache_path')->defaultValue('uploads/cache')->end()
+                ->scalarNode('google_cloud_host')->defaultValue('https://storage.googleapis.com')->end()
             ->end()
         ;
 
