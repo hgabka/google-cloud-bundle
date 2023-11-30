@@ -33,10 +33,45 @@ This is a Gaufrette filesystem, so you can then use it:
 $this->fileSystem->write('test.txt', 'sasadas2');
 ```
 
-This will then write to the uploads/media directory in the bucket.
+This will then write to the  the bucket.
 
 Bucket name must be configured in config/packages/hgabka_google_cloud.yaml:
 ```
 hgabka_google_cloud:
     bucket: 'my-bucket'
+```
+
+## Liip imagine
+
+There is a resolver that  saves the filtered image in Google Cloud as well. The cache is created in the liip imagine cache directory (hgabka_media.liip_imagine_cache_prefix)
+The 'google_cloud' resolver can be set in the filter call:
+
+
+```
+asset(googleCloudImageUrl)|imagine_filter('filter', [], 'google_cloud')
+```
+
+
+
+Or in the liip imagine config for all images:
+```
+liip_imagine:
+    cache: google_cloud
+```
+
+
+Also there is a loader that loads the image from the Google Cloud image url. This can be set on filter level:
+```
+    filter_sets:
+        my_filter:
+            quality: 100
+            data_loader: google_cloud
+```
+
+
+
+Or globally:
+```
+liip_imagine:
+    data_loader: google_cloud
 ```
